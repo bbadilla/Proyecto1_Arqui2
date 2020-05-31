@@ -35,7 +35,7 @@ class Core(threading.Thread):
         #print(memory)
         data_write = ''
 
-        control = Control_L1('', 0, main_memory)
+        control = Control_L1()
 
         #Generador de instrucciones
         while True:
@@ -47,6 +47,7 @@ class Core(threading.Thread):
             memory = np.random.binomial(25,0.5)%16
             aux_memory = memory
 
+            mutex.acquire()
             #mutex.acquire()
             #Instruccion de lectura
             if(distribution==0):
@@ -69,7 +70,7 @@ class Core(threading.Thread):
                 self.memory = bin(memory)
                 self.data = data_write
                 print(self.core + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
-                #control.write(aux_memory, self.cache_L1_00,self.cache_L1_01, self.cache_L1_10, self.cache_L1_11 , main_memory, counter, self.data, self.core, self.chip)
+                control.write(aux_memory, cache1, cache2, main_memory,  self.core, self.chip, self.data)
                 data_write = ''
                 #time.sleep(10)    
                 #counter += 1 
@@ -83,7 +84,7 @@ class Core(threading.Thread):
                 print(self.core + ','+str(self.chip)+': '+self.operation)
                 print(' ')
 
-            #mutex.release()
+            mutex.release()
 
 
         #print(self.core + ','+str(self.chip))
