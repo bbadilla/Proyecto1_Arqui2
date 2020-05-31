@@ -1,9 +1,12 @@
+
+
 import threading
 
-class Lines_L1(threading.Thread):
+class Lines_L2(threading.Thread):
     
     #Atributos
     state =  ' '
+    owner = ' '
     data = ' '
     direction = 0
     directionBin = 0
@@ -21,7 +24,6 @@ class Lines_L1(threading.Thread):
     def setLine(self, state, direction, data):
         self.state = state
         self.direction = direction
-        self.directionBin = bin(direction)
         self.data = data
 
     #Obtener el estado de la linea

@@ -2,20 +2,29 @@ import threading
 import time 
 import numpy as np
 import random
-from multiprocesador import Core
 from memory import Memory
+from chip import Chip
+from L1 import L1
 
 def main():
-    #Invocacion para generar los cores
-    core0_0 = Core('P0',0,1)
-    core1_0 = Core('P1',0,1)
-    core0_1 = Core('P0',1,1)
-    core1_1 = Core('P1',1,1)
 
-    core0_0.start()
-    core1_0.start()
-    core0_1.start()
-    core1_1.start()
+    main_memory = Memory()
+    cache_L1_00 = L1(0,'P0')
+    cache_L1_01 = L1(0,'P1')
+    cache_L1_10 = L1(1,'P0')
+    cache_L1_11 = L1(1,'P1')
+
+    #Invocacion para generar los chips
+    chip0 = Chip(0, main_memory, cache_L1_00, cache_L1_01)
+    #chip1 = Chip(1)
+    chip0.start()
+    #chip1.start()
+    #Cahes
+   
+   
+
+
+    #Definicion de la memoria principal
 
 
 if __name__ == "__main__":
