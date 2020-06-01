@@ -20,6 +20,7 @@ class Core(threading.Thread):
     data = ''
     core = ''
     chip = 0
+    instruction = ''
 
 
     #Constructor
@@ -52,7 +53,7 @@ class Core(threading.Thread):
             distribution = np.random.binomial(10,0.5)%3
 
             #Distribucion binomial para la direcciones de memoria
-            memory = np.random.binomial(25,0.5)%16
+            memory = np.random.binomial(20,0.5)%16
             aux_memory = memory
 
             mutex.acquire()
@@ -61,6 +62,7 @@ class Core(threading.Thread):
             if(distribution==0):
                 self.operation = 'READ'
                 self.memory = bin(memory)
+                self.instruction = str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)
                 print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))
                 control.read(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21,  main_memory, self.core, self.chip) 
@@ -74,6 +76,7 @@ class Core(threading.Thread):
                 self.operation = 'WRITE'
                 self.memory = bin(memory)
                 self.data = data_write
+                self.instruction = str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data
                 print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
                 control.write(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21, main_memory,  self.core, self.chip, self.data)
@@ -86,6 +89,7 @@ class Core(threading.Thread):
             #Instruccion de CALC
             else:
                 self.operation = 'CALC'
+                self.instruction = str(self.core) + ','+str(self.chip)+': '+self.operation
                 print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
                 time.sleep(3)

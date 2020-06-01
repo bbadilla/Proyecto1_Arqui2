@@ -56,6 +56,11 @@ class Control_L2(threading.Thread):
                 if(direc_mem == cache_recive.lines[search_lineL2].direction and cache_recive.lines[search_lineL2].state == 'DM'):
                         
                     #Cambia el estado de la caché L2 del otro chip
+                    cache_recive.lines[search_lineL2].state = 'DS'
+                    #Cambia el estado de la caché L2 del otro chip
+                    for i in range(len(cache_recive.lines[search_lineL2].owner)-1):
+                        if (cache_recive.lines[search_lineL2].owner[i] == ';'):
+                            cache_recive.lines[search_lineL2].owner = cache_recive.lines[search_lineL2].owner[0:i]
                     cache_recive.lines[search_lineL2].owner += ';E'
                     aux_owner = ';E'
                     memory_owner += ', C'+str(cache_recive.chip)
@@ -73,9 +78,7 @@ class Control_L2(threading.Thread):
                         cache_recive.lines[search_lineL2].state = 'DI'
                 else:
                     aux_owner = ''
-                    for i in range (len(cache_request.lines[search_lineL2].owner)-1):
-                        if cache_request.lines[search_lineL2].owner[i] == ';':
-                            cache_request.lines[search_lineL2].owner = cache_request.lines[search_lineL2].owner[0:i]
+                    
                 
                 #Busca en memoria Principal
                 #Escribe en Cache L2
@@ -100,6 +103,11 @@ class Control_L2(threading.Thread):
                     logging.info(bus)
                     logging.info('Verifica si la cache L2 '+str(cache_request.chip)+' tiene el dato para cambiar el estado si es necesario')    
                     #Cambia el estado de la caché L2 del otro chip
+                    cache_recive.lines[search_lineL2].state = 'DS'
+                    #Cambia el estado de la caché L2 del otro chip
+                    for i in range(len(cache_recive.lines[search_lineL2].owner)-1):
+                        if (cache_recive.lines[search_lineL2].owner[i] == ';'):
+                            cache_recive.lines[search_lineL2].owner = cache_recive.lines[search_lineL2].owner[0:i]
                     cache_recive.lines[search_lineL2].owner += ';E'
                     aux_owner = ';E'
                     memory_owner += ', C'+str(cache_recive.chip)
@@ -118,9 +126,7 @@ class Control_L2(threading.Thread):
 
                 else:
                     aux_owner = ''
-                    for i in range (len(cache_request.lines[search_lineL2].owner)-1):
-                        if cache_request.lines[search_lineL2].owner[i] == ';':
-                            cache_request.lines[search_lineL2].owner = cache_request.lines[search_lineL2].owner[0:i]
+                    
                 
                 #Cambia el owner
                 cache_request.lines[direc_mem%4].owner = core+','+str(chip)+owner+aux_owner
@@ -145,7 +151,11 @@ class Control_L2(threading.Thread):
             #Busca en la otra cache L2
             if(direc_mem == cache_recive.lines[search_lineL2].direction and (cache_recive.lines[search_lineL2].state == 'DM' or cache_recive.lines[search_lineL2].state == 'DS' )):
                     
+                cache_recive.lines[search_lineL2].state = 'DS'
                 #Cambia el estado de la caché L2 del otro chip
+                for i in range(len(cache_recive.lines[search_lineL2].owner)-1):
+                    if (cache_recive.lines[search_lineL2].owner[i] == ';'):
+                        cache_recive.lines[search_lineL2].owner = cache_recive.lines[search_lineL2].owner[0:i]
                 cache_recive.lines[search_lineL2].owner += ';E'
                 aux_owner = ';E'
                 memory_owner += ', C'+str(cache_recive.chip)
@@ -164,9 +174,7 @@ class Control_L2(threading.Thread):
 
             else:
                 aux_owner = ''
-                for i in range (len(cache_request.lines[search_lineL2].owner)-1):
-                    if cache_request.lines[search_lineL2].owner[i] == ';':
-                        cache_request.lines[search_lineL2].owner = cache_request.lines[search_lineL2].owner[0:i]
+                
             
             #Busca en memoria Principal
             #Escribe en Cache L2
@@ -232,6 +240,9 @@ class Control_L2(threading.Thread):
                 
             #Cambia el estado de la caché L2 del otro chip
             cache_recive.lines[search_lineL2].state = 'DI'
+            for i in range(len(cache_recive.lines[search_lineL2].owner)-1):
+                if (cache_recive.lines[search_lineL2].owner[i] == ';'):
+                    cache_recive.lines[search_lineL2].owner = cache_recive.lines[search_lineL2].owner[0:i]
             cache_recive.lines[search_lineL2].owner += ';E'
             aux_owner = ';E'
             memory_owner += ', C'+str(cache_recive.chip)
@@ -247,9 +258,7 @@ class Control_L2(threading.Thread):
                 None
         else:
             aux_owner = ''
-            for i in range (len(cache_request.lines[search_lineL2].owner)-1):
-                if cache_request.lines[search_lineL2].owner[i] == ';':
-                    cache_request.lines[search_lineL2].owner = cache_request.lines[search_lineL2].owner[0:i]
+            
 
         #Escribe en Cache L1
         cache_write.writeOnLine(cache_write.lines[direc_mem%2],  direc_mem, data, 'M')
