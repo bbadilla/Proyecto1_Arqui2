@@ -5,7 +5,8 @@ import random
 from memory import Memory
 from L1 import L1
 from threading import Thread, Lock
-
+from control_L2 import Control_L2
+import logging
 
 class Control_L1(threading.Thread):
 
@@ -14,231 +15,156 @@ class Control_L1(threading.Thread):
 
     def __init__(self):
         self
+
+
+    def read(self, controlL2, direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, memory, core, chip):
+
+        logging.info('Busca el dato en la cache  L1 '+str(core)+','+str(chip))
+        #Controlador de caches L1
         
-
-
-    def read(self, direc_mem, cache_process00, cache_process01, memory, core, chip):
-        print('Leyendo')
         #Asignacion de caches a utilizar
         if (chip == 0):
             if (core == 'P0'):
                 cache_request =  cache_process00
                 cache_recive = cache_process01
-                print('P0 procesa')
-                print('Cache P0')
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[0].number) +'  '+ str(cache_request.lines[0].state) +' '+ str(cache_request.lines[0].directionBin)+ '  ' +str(cache_request.lines[0].data))
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[1].number) +'  '+ str(cache_request.lines[1].state) +' '+ str(cache_request.lines[1].directionBin)+ '  ' +str(cache_request.lines[1].data))
-                print('Cache P1')
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[0].number) +'  '+ str(cache_recive.lines[0].state) +' '+ str(cache_recive.lines[0].directionBin)+ '  ' +str(cache_recive.lines[0].data))
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[1].number) +'  '+ str(cache_recive.lines[1].state) +' '+ str(cache_recive.lines[1].directionBin)+ '  ' +str(cache_recive.lines[1].data))
-
             else:
-                print('P1 procesa')
                 cache_request =  cache_process01
                 cache_recive = cache_process00
-                print('Cache P0')
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[0].number) +'  '+ str(cache_recive.lines[0].state) +' '+ str(cache_recive.lines[0].directionBin)+ '  ' +str(cache_recive.lines[0].data))
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[1].number) +'  '+ str(cache_recive.lines[1].state) +' '+ str(cache_recive.lines[1].directionBin)+ '  ' +str(cache_recive.lines[1].data))
-                print('Cache P1')
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[0].number) +'  '+ str(cache_request.lines[0].state) +' '+ str(cache_request.lines[0].directionBin)+ '  ' +str(cache_request.lines[0].data))
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[1].number) +'  '+ str(cache_request.lines[1].state) +' '+ str(cache_request.lines[1].directionBin)+ '  ' +str(cache_request.lines[1].data))
-               
-
-        ##################################  Logica de Reads entre L1's  ############################
-        #Casos por estados
-
-        for i in range(2):
-            print(" ")
-            print('INICIO')
-
-            #Acierta la posicion de memoria en cache
-            if (cache_request.lines[i].direction == direc_mem):
-                print("Esta en cache")
-
-                #Caso en el que la linea esta en invalido
-                if (cache_request.lines[i].state == 'I'):
-                    print('Invalido')
-                    print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[i].number) +'  '+ str(cache_request.lines[i].state) +' '+ str(cache_request.lines[i].directionBin)+ '  ' +str(cache_request.lines[i].data))
-                    #Mensaje en el bus
-                    bus = 'Read miss from cahe'+str(cache_request.chip)+' '+str(cache_request.core)
-                    #Verifica los estados de la otra cache
-                    for i in range(len(cache_recive.lines)):
-                        #Caso en que este M en la otra cache
-                        if (cache_recive.lines[i].state == 'M' and cache_recive.lines[i].direction == direc_mem):
-                            cache_recive.lines[i].state = 'S'
-                            print('Cache del procesador '+str(cache_recive.core))
-                            print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
-
-                    #Busca en memoria
-                    for x in range(16):
-                        if (direc_mem == memory.lines[x].position):
-                            cache_request.writeOnLine(cache_request.lines[i],  direc_mem, memory.lines[x].data, 'S')
-                            print('Cache del procesador '+str(cache_request.core))
-                            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[i].number) +'  '+ str(cache_request.lines[i].state) +' '+ str(cache_request.lines[i].directionBin)+ '  ' +str(cache_request.lines[i].data))
-                            time.sleep(6)
-                            return None
-                
-                #Caso en el que la linea esta en Compartido o Modificado
-                else:
-                    print('Modificaco o Compartido')
-                    print('Cache del procesador '+str(cache_request.core))
-                    print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[i].number) +'  '+ str(cache_request.lines[i].state) +' '+ str(cache_request.lines[i].directionBin)+ '  ' +str(cache_request.lines[i].data))
-                    return None
-                
-            #No Acierta la posicion de memoria en cache
+        else:
+            if (core == 'P0'):
+                cache_request =  cache_process10
+                cache_recive = cache_process11
             else:
-                print('No estaba en cache')
-                #Linea a cambiar
-                line_change = direc_mem%2
-                #Caso en el que la linea esta en invalido
+                cache_request =  cache_process11
+                cache_recive = cache_process10
+                
+        owner = ''
+        line_change = direc_mem%2
+        ##################################  Logica de Reads entre L1's  ############################
+    
 
-                #Caso en el que la linea esta en Compartido 
-                if (cache_request.lines[line_change].state == 'S'):
-                    print('Compartido')
-                    print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                    #Mensaje en el bus
-                    bus = 'Read miss from cahe'+str(cache_request.chip)+' '+str(cache_request.core)
-                    #Verifica los estados de la otra cache
-                    for i in range(len(cache_recive.lines)):
-                        #Caso en que este M en la otra cache
-                        if (cache_recive.lines[i].state == 'M' and cache_recive.lines[i].direction == direc_mem):
-                            cache_recive.lines[i].state = 'S'
-                            print('Cache del procesador '+str(cache_recive.core))
-                            print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
+        #Acierta la posicion de memoria en cache
+        if (cache_request.lines[line_change].direction == direc_mem):
+            print('Estaba en cache')
 
-                        #Busca en memoria
-                        for x in range(16):
-                            if (direc_mem == memory.lines[x].position):
-                                cache_request.writeOnLine(cache_request.lines[line_change],  direc_mem, memory.lines[x].data, 'S')
-                                print('Cache del procesador '+str(cache_request.core))
-                                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                                time.sleep(6)
-                                return None
+            #Caso en el que la linea esta en invalido
+            if (cache_request.lines[line_change].state == 'I'):
+                #Mensaje en el bus
+                bus = 'Read miss from cahe L1 '+str(cache_request.chip)+' '+str(cache_request.core)
+                logging.info(bus)
+                #Verifica los estados de la otra cache
+                #Caso en que este M en la otra cache
+                if (cache_recive.lines[line_change].state == 'M' and cache_recive.lines[line_change].direction == direc_mem):
+                    cache_recive.lines[line_change].state = 'S'
+                    owner = ','+cache_recive.core+','+str(cache_recive.chip)
+                        
+                #Llamada al control de L2 en caso invalido
+                controlL2.read(direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner)
 
-                elif (cache_request.lines[line_change].state == 'I'):
-                    print('Invalido')
-                    print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                    #Mensaje en el bus
-                    bus = 'Read miss from cahe'+str(cache_request.chip)+' '+str(cache_request.core)
-                    #Verifica los estados de la otra cache
-                    for i in range(len(cache_recive.lines)):
-                        #Caso en que este M en la otra cache
-                        if (cache_recive.lines[i].state == 'M' and cache_recive.lines[i].direction == direc_mem):
-                            cache_recive.lines[i].state = 'S'
-                            print('Cache del procesador '+str(cache_recive.core))
-                            print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
-
-                    #Busca en memoria
-                    for x in range(16):
-                        if (direc_mem == memory.lines[x].position):
-                            cache_request.writeOnLine(cache_request.lines[line_change],  direc_mem, memory.lines[x].data, 'S')
-                            print('Cache del procesador '+str(cache_request.core))
-                            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                            time.sleep(6)
-                            return None
-                    
-
-                #Caso en el que la linea esta en Modificado
-                else:
-                    print('Modificado')
-                    print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                    #Mensaje en el bus
-                    bus = 'Read miss from cahe'+str(cache_request.chip)+' '+str(cache_request.core)
-                    #Verifica los estados de la otra cache
-                    for i in range(len(cache_recive.lines)):
-                        #Caso en que este M en la otra cache
-                        if (cache_recive.lines[i].state == 'M' and cache_recive.lines[i].direction == direc_mem):
-                            cache_recive.lines[i].state = 'S'
-                            print('Cache del procesador '+str(cache_recive.core))
-                            print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
-
-                        #Busca en memoria
-                        for x in range(16):
-                            if (direc_mem == memory.lines[x].position):
-                                cache_request.writeOnLine(cache_request.lines[line_change],  direc_mem, memory.lines[x].data, 'S')
-                                print('Cache del procesador '+str(cache_request.core))
-                                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-                                time.sleep(6)
-                                return None
-        
+            #Caso en el que la linea esta en Compartido o Modificado
+            else:
+                bus = 'Read Hit '+str(cache_request.chip)+' '+str(cache_request.core)
+                logging.info(bus)
+                return None
+            
+        #No Acierta la posicion de memoria en cache
+        else:
+            bus = 'Read miss from cahe L1 '+str(cache_request.chip)+' '+str(cache_request.core)
+            logging.info(bus)
+            #Verifica los estados de la otra cache
+            if (cache_recive.lines[line_change].state == 'M' and cache_recive.lines[line_change].direction == direc_mem):
+                cache_recive.lines[line_change].state = 'S'
+                owner = ','+cache_recive.core+','+str(cache_recive.chip)
+            controlL2.read(direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner)
+        print('')
+        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[0].number) +'  '+ str(cache_process00.lines[0].state) +' '+ str(cache_process00.lines[0].directionBin)+ '  ' +str(cache_process00.lines[0].data))
+        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[1].number) +'  '+ str(cache_process00.lines[1].state) +' '+ str(cache_process00.lines[1].directionBin)+ '  ' +str(cache_process00.lines[1].data))
+        print('')
+        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[0].number) +'  '+ str(cache_process01.lines[0].state) +' '+ str(cache_process01.lines[0].directionBin)+ '  ' +str(cache_process01.lines[0].data))
+        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[1].number) +'  '+ str(cache_process01.lines[1].state) +' '+ str(cache_process01.lines[1].directionBin)+ '  ' +str(cache_process01.lines[1].data))
+        print('')
+        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[0].number) +'  '+ str(cache_process10.lines[0].state) +' '+ str(cache_process10.lines[0].directionBin)+ '  ' +str(cache_process10.lines[0].data))
+        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[1].number) +'  '+ str(cache_process10.lines[1].state) +' '+ str(cache_process10.lines[1].directionBin)+ '  ' +str(cache_process10.lines[1].data))
+        print('')
+        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[0].number) +'  '+ str(cache_process11.lines[0].state) +' '+ str(cache_process11.lines[0].directionBin)+ '  ' +str(cache_process11.lines[0].data))
+        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[1].number) +'  '+ str(cache_process11.lines[1].state) +' '+ str(cache_process11.lines[1].directionBin)+ '  ' +str(cache_process11.lines[1].data))
+        print('')
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[0].number) +'  '+ str(cache_processL20.lines[0].state) +' '+str(cache_processL20.lines[0].owner)+' '+str(cache_processL20.lines[0].directionBin)+ '  ' +str(cache_processL20.lines[0].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[1].number) +'  '+ str(cache_processL20.lines[1].state) +' '+str(cache_processL20.lines[1].owner)+' '+ str(cache_processL20.lines[1].directionBin)+ '  ' +str(cache_processL20.lines[1].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[2].number) +'  '+ str(cache_processL20.lines[2].state) +' '+str(cache_processL20.lines[2].owner)+' '+str(cache_processL20.lines[2].directionBin)+ '  ' +str(cache_processL20.lines[2].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[3].number) +'  '+ str(cache_processL20.lines[3].state) +' '+str(cache_processL20.lines[3].owner)+' '+ str(cache_processL20.lines[3].directionBin)+ '  ' +str(cache_processL20.lines[3].data))
+        print('')
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[0].number) +'  '+ str(cache_processL21.lines[0].state) +' '+str(cache_processL21.lines[0].owner)+' '+str(cache_processL21.lines[0].directionBin)+ '  ' +str(cache_processL21.lines[0].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[1].number) +'  '+ str(cache_processL21.lines[1].state) +' '+str(cache_processL21.lines[1].owner)+' '+ str(cache_processL21.lines[1].directionBin)+ '  ' +str(cache_processL21.lines[1].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[2].number) +'  '+ str(cache_processL21.lines[2].state) +' '+str(cache_processL21.lines[2].owner)+' '+str(cache_processL21.lines[2].directionBin)+ '  ' +str(cache_processL21.lines[2].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[3].number) +'  '+ str(cache_processL21.lines[3].state) +' '+str(cache_processL21.lines[3].owner)+' '+ str(cache_processL21.lines[3].directionBin)+ '  ' +str(cache_processL21.lines[3].data))
+        print('')
         for x in range(16):
             print ('Memo principal ' +str(bin(memory.lines[x].position))+'  '+ str(memory.lines[x].state)+'  '+str(memory.lines[x].owner) +'  '+ str(memory.lines[x].data) )
-        print("ACABO")
         print(" ")
-        cache_request = None
-        cache_recive = None
 
-    #########Escribir en las L1
-    def write(self, direc_mem, cache_process00, cache_process01, memory, core, chip, data):
-        print('Escribiendo')
+
+##########################Escribir en las L1
+
+    def write(self, controlL2, direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, memory, core, chip, data):
+        logging.info('Peticion de escritura generada en la cache L1 '+str(core)+','+str(chip))
         #Asignacion de caches a utilizar
         if (chip == 0):
             if (core == 'P0'):
                 cache_request =  cache_process00
                 cache_recive = cache_process01
-                print('P0 procesa')
-                print('Cache P0')
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[0].number) +'  '+ str(cache_request.lines[0].state) +' '+ str(cache_request.lines[0].directionBin)+ '  ' +str(cache_request.lines[0].data))
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[1].number) +'  '+ str(cache_request.lines[1].state) +' '+ str(cache_request.lines[1].directionBin)+ '  ' +str(cache_request.lines[1].data))
-                print('Cache P1')
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[0].number) +'  '+ str(cache_recive.lines[0].state) +' '+ str(cache_recive.lines[0].directionBin)+ '  ' +str(cache_recive.lines[0].data))
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[1].number) +'  '+ str(cache_recive.lines[1].state) +' '+ str(cache_recive.lines[1].directionBin)+ '  ' +str(cache_recive.lines[1].data))
-
             else:
-                print('P1 procesa')
                 cache_request =  cache_process01
                 cache_recive = cache_process00
-                print('Cache P0')
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[0].number) +'  '+ str(cache_recive.lines[0].state) +' '+ str(cache_recive.lines[0].directionBin)+ '  ' +str(cache_recive.lines[0].data))
-                print ( str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[1].number) +'  '+ str(cache_recive.lines[1].state) +' '+ str(cache_recive.lines[1].directionBin)+ '  ' +str(cache_recive.lines[1].data))
-                print('Cache P1')
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[0].number) +'  '+ str(cache_request.lines[0].state) +' '+ str(cache_request.lines[0].directionBin)+ '  ' +str(cache_request.lines[0].data))
-                print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[1].number) +'  '+ str(cache_request.lines[1].state) +' '+ str(cache_request.lines[1].directionBin)+ '  ' +str(cache_request.lines[1].data))
-        
+        else:
+            if (core == 'P0'):
+                cache_request =  cache_process10
+                cache_recive = cache_process11
+            else:
+                cache_request =  cache_process11
+                cache_recive = cache_process10
+                
+        owner = ''
         line_change = direc_mem%2
 
-        ## Caso cuando esta Invalido
-        if(cache_request.lines[line_change].state == 'I'):
-            print('Invalido')
-            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-            bus = 'write miss'
-            for i in range(len(cache_recive.lines)):
-                #Caso en que este M en la otra cache
-                if ((cache_recive.lines[i].state == 'M' or cache_recive.lines[i].state == 'S') and cache_recive.lines[i].direction == direc_mem):
-                    cache_recive.lines[i].state = 'I'
-                    print('Cache del procesador '+str(cache_recive.core))
-                    print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
-            
-            cache_request.writeOnLine(cache_request.lines[line_change],  direc_mem, data, 'M')
-            memory.setLine(direc_mem, ' ', core, data)
-            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
+        #Escritura en caches y en memoria
 
+        bus = 'Write Miss from cahe L1 '+str(cache_request.chip)+' '+str(cache_request.core)
+        logging.info(bus)
+        #Caso en que este M en la otra cache
+        if ((cache_recive.lines[line_change].state == 'M' or cache_recive.lines[line_change].state == 'S') and cache_recive.lines[line_change].direction == direc_mem):
+            cache_recive.lines[line_change].state = 'I'
+            owner = ','+cache_recive.core+','+str(cache_recive.chip)
+      
+        controlL2.write(direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner, data)
 
-        elif(cache_request.lines[line_change].state == 'S' or cache_request.lines[line_change].state == 'M'):
-            print('Modificado o Compartido')
-            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-            bus = 'write miss'
-            for i in range(len(cache_recive.lines)):
-                #Caso en que este M en la otra cache
-                if ((cache_recive.lines[i].state == 'M' or cache_recive.lines[i].state == 'S') and cache_recive.lines[i].direction == direc_mem):
-                    cache_recive.lines[i].state = 'I'
-                    print('Cache del procesador '+str(cache_recive.core))
-                    print (str(cache_recive.chip)+'  '+str(cache_recive.core) +'  '+ str(cache_recive.lines[i].number) +'  '+ str(cache_recive.lines[i].state) +' '+ str(cache_recive.lines[i].directionBin)+ '  ' +str(cache_recive.lines[i].data))
-            
-            cache_request.writeOnLine(cache_request.lines[line_change],  direc_mem, data, 'M')
-            memory.setLine(direc_mem, ' ', core, data)
-            print ( str(cache_request.chip)+'  '+str(cache_request.core) +'  '+ str(cache_request.lines[line_change].number) +'  '+ str(cache_request.lines[line_change].state) +' '+ str(cache_request.lines[line_change].directionBin)+ '  ' +str(cache_request.lines[line_change].data))
-
-
+        print('')
+        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[0].number) +'  '+ str(cache_process00.lines[0].state) +' '+ str(cache_process00.lines[0].directionBin)+ '  ' +str(cache_process00.lines[0].data))
+        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[1].number) +'  '+ str(cache_process00.lines[1].state) +' '+ str(cache_process00.lines[1].directionBin)+ '  ' +str(cache_process00.lines[1].data))
+        print('')
+        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[0].number) +'  '+ str(cache_process01.lines[0].state) +' '+ str(cache_process01.lines[0].directionBin)+ '  ' +str(cache_process01.lines[0].data))
+        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[1].number) +'  '+ str(cache_process01.lines[1].state) +' '+ str(cache_process01.lines[1].directionBin)+ '  ' +str(cache_process01.lines[1].data))
+        print('')
+        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[0].number) +'  '+ str(cache_process10.lines[0].state) +' '+ str(cache_process10.lines[0].directionBin)+ '  ' +str(cache_process10.lines[0].data))
+        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[1].number) +'  '+ str(cache_process10.lines[1].state) +' '+ str(cache_process10.lines[1].directionBin)+ '  ' +str(cache_process10.lines[1].data))
+        print('')
+        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[0].number) +'  '+ str(cache_process11.lines[0].state) +' '+ str(cache_process11.lines[0].directionBin)+ '  ' +str(cache_process11.lines[0].data))
+        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[1].number) +'  '+ str(cache_process11.lines[1].state) +' '+ str(cache_process11.lines[1].directionBin)+ '  ' +str(cache_process11.lines[1].data))
+        print('')
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[0].number) +'  '+ str(cache_processL20.lines[0].state) +' '+str(cache_processL20.lines[0].owner)+' '+str(cache_processL20.lines[0].directionBin)+ '  ' +str(cache_processL20.lines[0].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[1].number) +'  '+ str(cache_processL20.lines[1].state) +' '+str(cache_processL20.lines[1].owner)+' '+ str(cache_processL20.lines[1].directionBin)+ '  ' +str(cache_processL20.lines[1].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[2].number) +'  '+ str(cache_processL20.lines[2].state) +' '+str(cache_processL20.lines[2].owner)+' '+str(cache_processL20.lines[2].directionBin)+ '  ' +str(cache_processL20.lines[2].data))
+        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[3].number) +'  '+ str(cache_processL20.lines[3].state) +' '+str(cache_processL20.lines[3].owner)+' '+ str(cache_processL20.lines[3].directionBin)+ '  ' +str(cache_processL20.lines[3].data))
+        print('')
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[0].number) +'  '+ str(cache_processL21.lines[0].state) +' '+str(cache_processL21.lines[0].owner)+' '+str(cache_processL21.lines[0].directionBin)+ '  ' +str(cache_processL21.lines[0].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[1].number) +'  '+ str(cache_processL21.lines[1].state) +' '+str(cache_processL21.lines[1].owner)+' '+ str(cache_processL21.lines[1].directionBin)+ '  ' +str(cache_processL21.lines[1].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[2].number) +'  '+ str(cache_processL21.lines[2].state) +' '+str(cache_processL21.lines[2].owner)+' '+str(cache_processL21.lines[2].directionBin)+ '  ' +str(cache_processL21.lines[2].data))
+        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[3].number) +'  '+ str(cache_processL21.lines[3].state) +' '+str(cache_processL21.lines[3].owner)+' '+ str(cache_processL21.lines[3].directionBin)+ '  ' +str(cache_processL21.lines[3].data))
+        print('')
         for x in range(16):
             print ('Memo principal ' +str(bin(memory.lines[x].position))+'  '+ str(memory.lines[x].state)+'  '+str(memory.lines[x].owner) +'  '+ str(memory.lines[x].data) )
-        print("ACABO Escribir")
         print(" ")
-
-
-
-
-
-
     
-    
+
+
+            

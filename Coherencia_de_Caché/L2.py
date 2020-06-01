@@ -11,20 +11,22 @@ class L2(threading.Thread):
     #Lineas de memoria caché
     chip = 0
     core = 'P0'
-    line0 = Lines_L2(0,'',0,'0')
-    line1 = Lines_L2(1,'',0,'0')
-    line2 = Lines_L2(1,'',0,'0')
-    line3 = Lines_L2(1,'',0,'0')
+    line0 = Lines_L2(0,'DI',0,'0')
+    line1 = Lines_L2(1,'DI',0,'0')
+    line2 = Lines_L2(2,'DI',0,'0')
+    line3 = Lines_L2(3,'DI',0,'0')
     
     lines = [line0, line1, line2, line3]
 
-    def __init__(self, chip, core):
+    def __init__(self, chip):
         self.chip = chip
-        self.core = core
+        self.line0 = Lines_L2(0,'DI',0,'0')
+        self.line1 = Lines_L2(1,'DI',0,'0')
+        self.line2 = Lines_L2(2,'DI',0,'0')
+        self.line3 = Lines_L2(3,'DI',0,'0')
+        
+        self.lines = [self.line0, self.line1, self.line2, self.line3]
 
-    def write(self, owner, direc, data, state):
-        print('Esta es es la cache de '+str(self.core)+' Con el dato  '+str(data))
-
-        for x in range (len(self.lines)):
-            self.lines[x].setLine(state, owner, direc, data)
+    def write(self, line, owner, direc, data, state):
+        line.setLine(state, direc, data, owner )
 

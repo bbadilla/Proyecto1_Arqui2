@@ -22,15 +22,8 @@ class L1(threading.Thread):
         self.line1 = Lines_L1(1,'I',0,'0')
         self.lines = [self.line0, self.line1]
 
-    def write(self, n, direc, data, state):
-        print('Esta es es la cache de '+str(self.core)+' Con el dato  '+str(data))
-        if(n%2 == 0):
-            self.line0.setLine(state, direc, data)
-        else:
-            self.line1.setLine(state, direc, data)
 
     def writeOnLine(self, line, direc, data, state):
-        print('Esta es es la cache de '+str(self.core)+' Con el dato  '+str(data))
         line.setLine(state, direc, data)
 
         

@@ -6,6 +6,8 @@ import random
 from L1 import L1
 import queue
 from control_L1 import Control_L1
+from control_L2 import Control_L2
+import logging
 
 mutex = Lock()
 
@@ -21,14 +23,17 @@ class Core(threading.Thread):
 
 
     #Constructor
-    def __init__(self, core, chip, main_memory, cache1, cache2):
-        threading.Thread.__init__(self, name=core, target=Core.instruction_generator, args=(self, main_memory,cache1, cache2, core, chip,))
+    def __init__(self, core, chip, main_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21):
+        threading.Thread.__init__(self, name=core, target=Core.instruction_generator, args=(self, main_memory,cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21, core, chip,))
         self.core = core
         self.chip = chip
+         #Definicion de los LOG
+        logging.basicConfig(filename='LOG.log', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
         
-    def instruction_generator(self, main_memory,cache1,cache2,core, chip):
+    def instruction_generator(self, main_memory,cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21,core, chip):
+        
         
         #Contador
         counter = 0
@@ -36,6 +41,9 @@ class Core(threading.Thread):
         data_write = ''
 
         control = Control_L1()
+        control_L2 = Control_L2()
+
+       
 
         #Generador de instrucciones
         while True:
@@ -48,19 +56,16 @@ class Core(threading.Thread):
             aux_memory = memory
 
             mutex.acquire()
-            #mutex.acquire()
+
             #Instruccion de lectura
             if(distribution==0):
                 self.operation = 'READ'
                 self.memory = bin(memory)
-                print(self.core + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))     
-                control.read(aux_memory, cache1,cache2,  main_memory, self.core, self.chip)
-                #print (str(self.cache_L1.chip)+'  '+str(self.cache_L1.core) +'  '+ str(self.cache_L1.line0.number) +'  '+ str(self.cache_L1.line0.state) +' '+ str(self.cache_L1.line0.direction)+ '  ' +str(self.cache_L1.line0.data))
-                time.sleep(5)    
+                print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))
+                logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))
+                control.read(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21,  main_memory, self.core, self.chip) 
                 counter += 1    
-                print(' ')
-
-   
+                logging.info('FIN DE LA EJECUCION \n')
 
             #Instruccion de escritura
             elif(distribution==2):
@@ -69,27 +74,23 @@ class Core(threading.Thread):
                 self.operation = 'WRITE'
                 self.memory = bin(memory)
                 self.data = data_write
-                print(self.core + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
-                control.write(aux_memory, cache1, cache2, main_memory,  self.core, self.chip, self.data)
+                print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
+                logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
+                control.write(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21, main_memory,  self.core, self.chip, self.data)
                 data_write = ''
-                #time.sleep(10)    
+                time.sleep(5)    
                 #counter += 1 
-                print(' ')
-
-
-
+                logging.info('FIN DE LA EJECUCION \n')
+                
+ 
             #Instruccion de CALC
             else:
                 self.operation = 'CALC'
-                print(self.core + ','+str(self.chip)+': '+self.operation)
-                print(' ')
-
-            mutex.release()
-
-
+                print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
+                logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
+                time.sleep(3)
+                logging.info('FIN DE LA EJECUCION DEL CALCULO\n')
+                
         #print(self.core + ','+str(self.chip))
             time.sleep(1)
-            
-
-
-
+            mutex.release()
