@@ -56,7 +56,7 @@ class Core(threading.Thread):
             memory = np.random.binomial(20,0.5)%16
             aux_memory = memory
 
-            mutex.acquire()
+            #mutex.acquire()
 
             #Instruccion de lectura
             if(distribution==0):
@@ -67,11 +67,10 @@ class Core(threading.Thread):
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory))
                 control.read(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21,  main_memory, self.core, self.chip) 
                 counter += 1    
-                logging.info('FIN DE LA EJECUCION \n')
 
             #Instruccion de escritura
             elif(distribution==2):
-                for x in range(4):
+                for x in range(8):
                     data_write += random.choice('ABCDEF123456789')
                 self.operation = 'WRITE'
                 self.memory = bin(memory)
@@ -81,9 +80,8 @@ class Core(threading.Thread):
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation+' '+str(self.memory)+'; '+self.data)
                 control.write(control_L2, aux_memory, cache_L100, cache_L101, cache_L110, cache_L111, cache_L20, cache_L21, main_memory,  self.core, self.chip, self.data)
                 data_write = ''
-                time.sleep(5)    
                 #counter += 1 
-                logging.info('FIN DE LA EJECUCION \n')
+                
                 
  
             #Instruccion de CALC
@@ -93,8 +91,8 @@ class Core(threading.Thread):
                 print('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
                 logging.info('Se lanza la instruccion '+str(self.core) + ','+str(self.chip)+': '+self.operation)
                 time.sleep(3)
-                logging.info('FIN DE LA EJECUCION DEL CALCULO\n')
+                
                 
         #print(self.core + ','+str(self.chip))
             time.sleep(1)
-            mutex.release()
+            #mutex.release()

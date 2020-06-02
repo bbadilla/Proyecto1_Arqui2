@@ -30,8 +30,6 @@ def main():
     chip0.start()
     chip1.start()
 
-    ##t.set(0,1,'PENE')
-
     print('Hola mainLoop')
     
     root = Tk()

@@ -45,6 +45,7 @@ class Control_L1(threading.Thread):
 
         #Acierta la posicion de memoria en cache
         if (cache_request.lines[line_change].direction == direc_mem):
+            time.sleep(1)
             print('Estaba en cache')
 
             #Caso en el que la linea esta en invalido
@@ -76,38 +77,14 @@ class Control_L1(threading.Thread):
                 cache_recive.lines[line_change].state = 'S'
                 owner = ','+cache_recive.core+','+str(cache_recive.chip)
             controlL2.read(direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner)
-        print('')
-        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[0].number) +'  '+ str(cache_process00.lines[0].state) +' '+ str(cache_process00.lines[0].directionBin)+ '  ' +str(cache_process00.lines[0].data))
-        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[1].number) +'  '+ str(cache_process00.lines[1].state) +' '+ str(cache_process00.lines[1].directionBin)+ '  ' +str(cache_process00.lines[1].data))
-        print('')
-        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[0].number) +'  '+ str(cache_process01.lines[0].state) +' '+ str(cache_process01.lines[0].directionBin)+ '  ' +str(cache_process01.lines[0].data))
-        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[1].number) +'  '+ str(cache_process01.lines[1].state) +' '+ str(cache_process01.lines[1].directionBin)+ '  ' +str(cache_process01.lines[1].data))
-        print('')
-        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[0].number) +'  '+ str(cache_process10.lines[0].state) +' '+ str(cache_process10.lines[0].directionBin)+ '  ' +str(cache_process10.lines[0].data))
-        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[1].number) +'  '+ str(cache_process10.lines[1].state) +' '+ str(cache_process10.lines[1].directionBin)+ '  ' +str(cache_process10.lines[1].data))
-        print('')
-        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[0].number) +'  '+ str(cache_process11.lines[0].state) +' '+ str(cache_process11.lines[0].directionBin)+ '  ' +str(cache_process11.lines[0].data))
-        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[1].number) +'  '+ str(cache_process11.lines[1].state) +' '+ str(cache_process11.lines[1].directionBin)+ '  ' +str(cache_process11.lines[1].data))
-        print('')
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[0].number) +'  '+ str(cache_processL20.lines[0].state) +' '+str(cache_processL20.lines[0].owner)+' '+str(cache_processL20.lines[0].directionBin)+ '  ' +str(cache_processL20.lines[0].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[1].number) +'  '+ str(cache_processL20.lines[1].state) +' '+str(cache_processL20.lines[1].owner)+' '+ str(cache_processL20.lines[1].directionBin)+ '  ' +str(cache_processL20.lines[1].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[2].number) +'  '+ str(cache_processL20.lines[2].state) +' '+str(cache_processL20.lines[2].owner)+' '+str(cache_processL20.lines[2].directionBin)+ '  ' +str(cache_processL20.lines[2].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[3].number) +'  '+ str(cache_processL20.lines[3].state) +' '+str(cache_processL20.lines[3].owner)+' '+ str(cache_processL20.lines[3].directionBin)+ '  ' +str(cache_processL20.lines[3].data))
-        print('')
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[0].number) +'  '+ str(cache_processL21.lines[0].state) +' '+str(cache_processL21.lines[0].owner)+' '+str(cache_processL21.lines[0].directionBin)+ '  ' +str(cache_processL21.lines[0].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[1].number) +'  '+ str(cache_processL21.lines[1].state) +' '+str(cache_processL21.lines[1].owner)+' '+ str(cache_processL21.lines[1].directionBin)+ '  ' +str(cache_processL21.lines[1].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[2].number) +'  '+ str(cache_processL21.lines[2].state) +' '+str(cache_processL21.lines[2].owner)+' '+str(cache_processL21.lines[2].directionBin)+ '  ' +str(cache_processL21.lines[2].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[3].number) +'  '+ str(cache_processL21.lines[3].state) +' '+str(cache_processL21.lines[3].owner)+' '+ str(cache_processL21.lines[3].directionBin)+ '  ' +str(cache_processL21.lines[3].data))
-        print('')
-        for x in range(16):
-            print ('Memo principal ' +str(bin(memory.lines[x].position))+'  '+ str(memory.lines[x].state)+'  '+str(memory.lines[x].owner) +'  '+ str(memory.lines[x].data) )
-        print(" ")
+        
 
 
 ##########################Escribir en las L1
 
     def write(self, controlL2, direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, memory, core, chip, data):
         logging.info('Peticion de escritura generada en la cache L1 '+str(core)+','+str(chip))
+        time.sleep(1)
         #Asignacion de caches a utilizar
         if (chip == 0):
             if (core == 'P0'):
@@ -138,33 +115,7 @@ class Control_L1(threading.Thread):
       
         controlL2.write(direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner, data)
 
-        print('')
-        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[0].number) +'  '+ str(cache_process00.lines[0].state) +' '+ str(cache_process00.lines[0].directionBin)+ '  ' +str(cache_process00.lines[0].data))
-        print ( str(cache_process00.chip)+'  '+str(cache_process00.core) +'  '+ str(cache_process00.lines[1].number) +'  '+ str(cache_process00.lines[1].state) +' '+ str(cache_process00.lines[1].directionBin)+ '  ' +str(cache_process00.lines[1].data))
-        print('')
-        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[0].number) +'  '+ str(cache_process01.lines[0].state) +' '+ str(cache_process01.lines[0].directionBin)+ '  ' +str(cache_process01.lines[0].data))
-        print ( str(cache_process01.chip)+'  '+str(cache_process01.core) +'  '+ str(cache_process01.lines[1].number) +'  '+ str(cache_process01.lines[1].state) +' '+ str(cache_process01.lines[1].directionBin)+ '  ' +str(cache_process01.lines[1].data))
-        print('')
-        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[0].number) +'  '+ str(cache_process10.lines[0].state) +' '+ str(cache_process10.lines[0].directionBin)+ '  ' +str(cache_process10.lines[0].data))
-        print ( str(cache_process10.chip)+'  '+str(cache_process10.core) +'  '+ str(cache_process10.lines[1].number) +'  '+ str(cache_process10.lines[1].state) +' '+ str(cache_process10.lines[1].directionBin)+ '  ' +str(cache_process10.lines[1].data))
-        print('')
-        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[0].number) +'  '+ str(cache_process11.lines[0].state) +' '+ str(cache_process11.lines[0].directionBin)+ '  ' +str(cache_process11.lines[0].data))
-        print ( str(cache_process11.chip)+'  '+str(cache_process11.core) +'  '+ str(cache_process11.lines[1].number) +'  '+ str(cache_process11.lines[1].state) +' '+ str(cache_process11.lines[1].directionBin)+ '  ' +str(cache_process11.lines[1].data))
-        print('')
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[0].number) +'  '+ str(cache_processL20.lines[0].state) +' '+str(cache_processL20.lines[0].owner)+' '+str(cache_processL20.lines[0].directionBin)+ '  ' +str(cache_processL20.lines[0].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[1].number) +'  '+ str(cache_processL20.lines[1].state) +' '+str(cache_processL20.lines[1].owner)+' '+ str(cache_processL20.lines[1].directionBin)+ '  ' +str(cache_processL20.lines[1].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[2].number) +'  '+ str(cache_processL20.lines[2].state) +' '+str(cache_processL20.lines[2].owner)+' '+str(cache_processL20.lines[2].directionBin)+ '  ' +str(cache_processL20.lines[2].data))
-        print ( str(cache_processL20.chip)+'  '+str(cache_processL20.lines[3].number) +'  '+ str(cache_processL20.lines[3].state) +' '+str(cache_processL20.lines[3].owner)+' '+ str(cache_processL20.lines[3].directionBin)+ '  ' +str(cache_processL20.lines[3].data))
-        print('')
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[0].number) +'  '+ str(cache_processL21.lines[0].state) +' '+str(cache_processL21.lines[0].owner)+' '+str(cache_processL21.lines[0].directionBin)+ '  ' +str(cache_processL21.lines[0].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[1].number) +'  '+ str(cache_processL21.lines[1].state) +' '+str(cache_processL21.lines[1].owner)+' '+ str(cache_processL21.lines[1].directionBin)+ '  ' +str(cache_processL21.lines[1].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[2].number) +'  '+ str(cache_processL21.lines[2].state) +' '+str(cache_processL21.lines[2].owner)+' '+str(cache_processL21.lines[2].directionBin)+ '  ' +str(cache_processL21.lines[2].data))
-        print ( str(cache_processL21.chip)+'  '+str(cache_processL21.lines[3].number) +'  '+ str(cache_processL21.lines[3].state) +' '+str(cache_processL21.lines[3].owner)+' '+ str(cache_processL21.lines[3].directionBin)+ '  ' +str(cache_processL21.lines[3].data))
-        print('')
-        for x in range(16):
-            print ('Memo principal ' +str(bin(memory.lines[x].position))+'  '+ str(memory.lines[x].state)+'  '+str(memory.lines[x].owner) +'  '+ str(memory.lines[x].data) )
-        print(" ")
-    
+       
 
 
             

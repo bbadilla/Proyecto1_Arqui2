@@ -9,8 +9,9 @@ class Control_L2(threading.Thread):
     def __init__(self):
         self
 
-    #READ cuando se esta en Invalido
+    #READ 
     def read(self, direc_mem, cache_process00, cache_process01, cache_process10, cache_process11, cache_processL20, cache_processL21, chip, core, memory, owner):
+        time.sleep(3)
         logging.info('Busca el dato en la cache  L2 '+str(chip))
         global aux_owner 
         global memory_owner
@@ -79,7 +80,7 @@ class Control_L2(threading.Thread):
                 else:
                     aux_owner = ''
                     
-                
+                time.sleep(5)
                 #Busca en memoria Principal
                 #Escribe en Cache L2
                 logging.info('Buscando en memoria el dato en la posicion '+str(direc_mem))
@@ -175,7 +176,7 @@ class Control_L2(threading.Thread):
             else:
                 aux_owner = ''
                 
-            
+            time.sleep(5)
             #Busca en memoria Principal
             #Escribe en Cache L2
             logging.info('Buscando en memoria el dato en la posicion '+str(direc_mem))
@@ -201,6 +202,7 @@ class Control_L2(threading.Thread):
         logging.info('Peticion de escritura que llega a la cache L2 '+str(chip))
         global aux_owner 
         global memory_owner
+        time.sleep(3)
 
         aux_owner = ''
 
@@ -259,7 +261,7 @@ class Control_L2(threading.Thread):
         else:
             aux_owner = ''
             
-
+        time.sleep(5)
         #Escribe en Cache L1
         cache_write.writeOnLine(cache_write.lines[direc_mem%2],  direc_mem, data, 'M')
         
@@ -278,4 +280,4 @@ class Control_L2(threading.Thread):
         logging.info('Escribe en cache L1 '+str(cache_write.core)+','+str(cache_write.chip))
         logging.info('            '+str(cache_write.lines[direc_mem%2].number)+'  '+str(cache_write.lines[direc_mem%2].state)+'  '+str(cache_write.lines[direc_mem%2].data))
     
-        time.sleep(6)
+
